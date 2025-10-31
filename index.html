@@ -13,13 +13,9 @@
         background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
         color: #e6eef8; 
         /* Center the content */
-        display: flex; 
-        justify-content: center; /* Center horizontally */
-        align-items: flex-start; /* Center vertically */
+        /* Center vertically */
         box-sizing: border-box;
         height: 100vh;
-        padding-top: 20px;
-        width: 95%;
     }
 
     /* Widget Container */
@@ -36,14 +32,14 @@
 
     .wrapper {
     /* The wrapper should be full width to contain the centered content */
-    width: 100%; 
-    
+    width: 95%; 
+    padding-top: 20px;
     /* Add a clean, small margin to push the content down from the top edge */
     
     /* Use flexbox within the wrapper to center the card */
     display: flex;
     justify-content: center; /* Centers the .trade-card inside the wrapper */
-    align-items: flex-start;
+    align-items: center;
 }
 
     /* Header Section */
