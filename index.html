@@ -6,155 +6,94 @@
 <title>ETH Profit Widget (CoinDCX)</title>
 
 <style>
-    /* Global Styles: Ensure full coverage and remove default browser margins */
+    /* Global Styles: Ensure clean slate and body handles the scrollable content */
     html, body {
         height: 100%;
         width: 100%;
         margin: 0;
         
+        background-color: transparent; 
+        
         font-family: 'Inter', 'Segoe UI', 'Roboto', 'system-ui', 'Arial', sans-serif;
         color: #e6eef8; 
         box-sizing: border-box;
         
-        /* Set body to flex to position the wrapper */
         display: flex; 
-        justify-content: center; /* Center WRAPPER horizontally */
-        align-items: flex-start; /* Place WRAPPER at the TOP */
+        justify-content: center; 
+        align-items: flex-start; 
     }
 
-    /* Wrapper: Forces full viewport coverage and applies the dark background */
-    .wrapper {
-        /* APPLY BACKGROUND HERE for full screen coverage on mobile */
-        background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
+    /* Fixed Background Layer: Guarantees full screen dark background */
+    .background-layer {
+        position: fixed; 
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1; 
         
-        /* Ensures the wrapper fills the entire viewable area */
+        background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
+    }
+
+    /* Wrapper: Positions the content and accounts for screen height */
+    .wrapper {
         min-height: 100vh;
         width: 100vw;
         
-        /* Use flexbox within the wrapper to center the card */
         display: flex;
-        justify-content: center; /* Centers the .trade-card inside the wrapper */
+        justify-content: center; 
         align-items: flex-start;
         
-        /* Adds the desired space from the top edge */
+        /* Only keeps top vertical padding */
         padding-top: 20px; 
+        padding-left: 0;
+        padding-right: 0;
     }
 
     /* Widget Container */
     .trade-card {
         background-color: #1a1e27; 
         border-radius: 12px;
-        padding: 20px;
-        width: 350px; 
+        
+        /* KEEP INTERNAL PADDING for text */
+        padding: 20px; 
+        
+        /* NEW: Fluid width for edge-to-edge appearance on mobile */
+        width: 90%; 
+        max-width: 400px; 
+        
+        /* Small horizontal margin to prevent touching the physical device edge */
+        margin: 0 10px; 
+        
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         display: flex;
         flex-direction: column;
         gap: 15px; 
     }
 
-    /* Header Section */
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .pair-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .pair-name {
-        font-size: 1.3em;
-        font-weight: 600;
-        color: #e6eef8;
-    }
-
-    .long-tag {
-        background-color: #008000; 
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.8em;
-        font-weight: 500;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-    }
-
-    .action-buttons button {
-        background: none;
-        border: none;
-        color: #a0a0a0;
-        font-size: 1.2em;
-        cursor: pointer;
-    }
-
-    /* PNL and ROE Section */
-    .pnl-roe-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        text-align: left;
-    }
-
-    .pnl-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .pnl-label, .roe-label {
-        font-size: 0.85em;
-        color: #a0a0a0;
-        margin-bottom: 5px;
-    }
-
-    .pnl-value, .roe-value {
-        font-size: 1.6em;
-        font-weight: 700;
-    }
-
-    .positive {
-        color: #00a000; 
-    }
-
-    .negative {
-        color: #d00000; 
-    }
-
-    /* Details Grid Section */
-    .details-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 15px 10px; 
-        margin-top: 15px;
-    }
-
-    .detail-item {
-        display: flex;
-        flex-direction: column;
-        text-align: left;
-    }
-
-    .detail-label {
-        font-size: 0.8em;
-        color: #a0a0a0;
-        margin-bottom: 3px;
-    }
-
-    .detail-value {
-        font-size: 1em;
-        font-weight: 500;
-        color: #e6eef8;
-    }
+    /* --- REST OF THE STYLES --- */
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .pair-info { display: flex; align-items: center; gap: 10px; }
+    .pair-name { font-size: 1.3em; font-weight: 600; color: #e6eef8; }
+    .long-tag { background-color: #008000; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 500; }
+    .action-buttons { display: flex; gap: 10px; }
+    .action-buttons button { background: none; border: none; color: #a0a0a0; font-size: 1.2em; cursor: pointer; }
+    .pnl-roe-section { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
+    .pnl-item { display: flex; flex-direction: column; }
+    .pnl-label, .roe-label { font-size: 0.85em; color: #a0a0a0; margin-bottom: 5px; }
+    .pnl-value, .roe-value { font-size: 1.6em; font-weight: 700; }
+    .positive { color: #00a000; }
+    .negative { color: #d00000; }
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px 10px; margin-top: 15px; }
+    .detail-item { display: flex; flex-direction: column; text-align: left; }
+    .detail-label { font-size: 0.8em; color: #a0a0a0; margin-bottom: 3px; }
+    .detail-value { font-size: 1em; font-weight: 500; color: #e6eef8; }
 </style>
 </head>
 
 <body>
+    <div class="background-layer"></div>
+    
     <div class="wrapper">
         <div class="trade-card">
             
@@ -215,11 +154,11 @@
     const REFRESH_INTERVAL_MS = 15000; // 15 seconds
 
     // --- Hardcoded TRADE DETAILS (UPDATE THESE) ---
-    const LEVERAGE = 1; // Set your actual leverage (e.g., 5, 10, etc.)
+    const LEVERAGE = 1; 
     const AVG_ENTRY_PRICE_USD = 3795.53; 
     const QUANTITY_ETH = 0.027; 
     const MARGIN_INR = 9529.89; 
-    const USD_INR_RATE = 83.50; // Current USD to INR conversion rate (Must be accurate!)
+    const USD_INR_RATE = 83.50; 
 
     // --- Element References ---
     const activePnlElement = document.getElementById('activePnl');
@@ -227,7 +166,6 @@
     const ltpUsdtElement = document.getElementById('ltpUsdt');
     const leverageTagElement = document.getElementById('leverageTag');
 
-    // Initialize the leverage tag display
     leverageTagElement.innerText = `Long ${LEVERAGE}x`;
 
 
@@ -236,19 +174,11 @@
      * @param {number} ltp The Last Traded Price (LTP) in USDT.
      */
     function updateCalculations(ltp) {
-        // PNL (USDT) based on price movement and quantity
         const priceDifference = ltp - AVG_ENTRY_PRICE_USD;
         const pnlUsdt = priceDifference * QUANTITY_ETH;
-        
-        // PNL (INR) for display and ROE calculation
         const pnlInr = pnlUsdt * USD_INR_RATE;
-        
-        // ROE (%) = (PNL_INR / MARGIN_INR) * 100
         const roePercentage = (pnlInr / MARGIN_INR) * 100;
 
-
-        // --- Update DOM ---
-        
         // PNL Update
         const pnlText = `${pnlInr >= 0 ? '+' : ''}₹${pnlInr.toFixed(2)}`;
         activePnlElement.innerText = pnlText;
