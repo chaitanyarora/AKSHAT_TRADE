@@ -6,16 +6,38 @@
 <title>ETH Profit Widget (CoinDCX)</title>
 
 <style>
-    /* Global Styles */
+    /* Global Styles: Ensure full coverage and remove default browser margins */
     html, body {
+        height: 100%;
+        width: 100%;
         margin: 0;
+        
         font-family: 'Inter', 'Segoe UI', 'Roboto', 'system-ui', 'Arial', sans-serif;
-        background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
         color: #e6eef8; 
-        /* Center the content */
-        /* Center vertically */
         box-sizing: border-box;
-        height: 100vh;
+        
+        /* Set body to flex to position the wrapper */
+        display: flex; 
+        justify-content: center; /* Center WRAPPER horizontally */
+        align-items: flex-start; /* Place WRAPPER at the TOP */
+    }
+
+    /* Wrapper: Forces full viewport coverage and applies the dark background */
+    .wrapper {
+        /* APPLY BACKGROUND HERE for full screen coverage on mobile */
+        background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
+        
+        /* Ensures the wrapper fills the entire viewable area */
+        min-height: 100vh;
+        width: 100vw;
+        
+        /* Use flexbox within the wrapper to center the card */
+        display: flex;
+        justify-content: center; /* Centers the .trade-card inside the wrapper */
+        align-items: flex-start;
+        
+        /* Adds the desired space from the top edge */
+        padding-top: 20px; 
     }
 
     /* Widget Container */
@@ -29,18 +51,6 @@
         flex-direction: column;
         gap: 15px; 
     }
-
-    .wrapper {
-    /* The wrapper should be full width to contain the centered content */
-    width: 95%; 
-    padding-top: 20px;
-    /* Add a clean, small margin to push the content down from the top edge */
-    
-    /* Use flexbox within the wrapper to center the card */
-    display: flex;
-    justify-content: center; /* Centers the .trade-card inside the wrapper */
-    align-items: center;
-}
 
     /* Header Section */
     .card-header {
@@ -62,7 +72,6 @@
         color: #e6eef8;
     }
 
-    /* Updated Long Tag to include leverage */
     .long-tag {
         background-color: #008000; 
         color: white;
@@ -110,18 +119,18 @@
     }
 
     .positive {
-        color: #00a000; /* Bright green for positive values */
+        color: #00a000; 
     }
 
     .negative {
-        color: #d00000; /* Red for negative values */
+        color: #d00000; 
     }
 
     /* Details Grid Section */
     .details-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr; /* Three columns */
-        gap: 15px 10px; /* Vertical and horizontal gap */
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 15px 10px; 
         margin-top: 15px;
     }
 
@@ -147,70 +156,70 @@
 
 <body>
     <div class="wrapper">
-    <div class="trade-card">
-        
-        <div class="card-header">
-            <div class="pair-info">
-                <span class="pair-name">ETH • USDT</span>
-                <span id="leverageTag" class="long-tag">Long 1x</span> 
+        <div class="trade-card">
+            
+            <div class="card-header">
+                <div class="pair-info">
+                    <span class="pair-name">ETH • USDT</span>
+                    <span id="leverageTag" class="long-tag">Long 1x</span> 
+                </div>
+                <div class="action-buttons">
+                    <button title="Info">ⓘ</button>
+                    <button title="Share">↗</button>
+                </div>
             </div>
-            <div class="action-buttons">
-                <button title="Info">ⓘ</button>
-                <button title="Share">↗</button>
-            </div>
-        </div>
 
-        <div class="pnl-roe-section">
-            <div class="pnl-item">
-                <span class="pnl-label">Active PNL</span>
-                <span id="activePnl" class="pnl-value">Loading...</span>
+            <div class="pnl-roe-section">
+                <div class="pnl-item">
+                    <span class="pnl-label">Active PNL</span>
+                    <span id="activePnl" class="pnl-value">Loading...</span>
+                </div>
+                <div class="pnl-item">
+                    <span class="roe-label">ROE</span>
+                    <span id="roe" class="roe-value">...</span>
+                </div>
             </div>
-            <div class="pnl-item">
-                <span class="roe-label">ROE</span>
-                <span id="roe" class="roe-value">...</span>
-            </div>
-        </div>
 
-        <div class="details-grid">
-            <div class="detail-item">
-                <span class="detail-label">Qty (ETH)</span>
-                <span id="qtyEth" class="detail-value">0.027</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Size</span>
-                <span id="sizeValue" class="detail-value">₹9,620.94</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Margin</span>
-                <span id="marginValue" class="detail-value">₹9,529.89</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Avg. Entry (USDT)</span>
-                <span id="avgEntry" class="detail-value">3795.53</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">LTP (USDT)</span>
-                <span id="ltpUsdt" class="detail-value">...</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Liq. Price (USDT)</span>
-                <span id="liqPrice" class="detail-value">41.86</span>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Qty (ETH)</span>
+                    <span id="qtyEth" class="detail-value">0.027</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Size</span>
+                    <span id="sizeValue" class="detail-value">₹9,620.94</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Margin</span>
+                    <span id="marginValue" class="detail-value">₹9,529.89</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Avg. Entry (USDT)</span>
+                    <span id="avgEntry" class="detail-value">3795.53</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">LTP (USDT)</span>
+                    <span id="ltpUsdt" class="detail-value">...</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Liq. Price (USDT)</span>
+                    <span id="liqPrice" class="detail-value">41.86</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 <script>
     const API_URL = "https://api.coindcx.com/exchange/ticker";
     const PAIR = "ETHUSDT";
     const REFRESH_INTERVAL_MS = 15000; // 15 seconds
 
-    // --- Hardcoded TRADE DETAILS (Update these with your real trade values) ---
-    const LEVERAGE = 1; // <-- NEW: Set your actual leverage here (e.g., 5x, 10x)
+    // --- Hardcoded TRADE DETAILS (UPDATE THESE) ---
+    const LEVERAGE = 1; // Set your actual leverage (e.g., 5, 10, etc.)
     const AVG_ENTRY_PRICE_USD = 3795.53; 
     const QUANTITY_ETH = 0.027; 
-    const MARGIN_INR = 9529.89; // Initial margin used for the trade
-    const USD_INR_RATE = 83.50; // Required for PNL_INR calculation
+    const MARGIN_INR = 9529.89; 
+    const USD_INR_RATE = 83.50; // Current USD to INR conversion rate (Must be accurate!)
 
     // --- Element References ---
     const activePnlElement = document.getElementById('activePnl');
@@ -218,7 +227,7 @@
     const ltpUsdtElement = document.getElementById('ltpUsdt');
     const leverageTagElement = document.getElementById('leverageTag');
 
-    // Update the leverage tag in the header
+    // Initialize the leverage tag display
     leverageTagElement.innerText = `Long ${LEVERAGE}x`;
 
 
@@ -227,21 +236,18 @@
      * @param {number} ltp The Last Traded Price (LTP) in USDT.
      */
     function updateCalculations(ltp) {
-        // --- 1. Calculate PNL (USDT) ---
-        // This is the profit from the change in price multiplied by the quantity. Leverage does NOT affect PNL in base currency.
+        // PNL (USDT) based on price movement and quantity
         const priceDifference = ltp - AVG_ENTRY_PRICE_USD;
         const pnlUsdt = priceDifference * QUANTITY_ETH;
         
-        // --- 2. Calculate PNL (INR) for display ---
+        // PNL (INR) for display and ROE calculation
         const pnlInr = pnlUsdt * USD_INR_RATE;
         
-        // --- 3. Calculate ROE (%) ---
-        // ROE = (PNL_INR / MARGIN_INR) * 100
-        // Leverage is implicitly factored in because MARGIN_INR is the actual equity used.
+        // ROE (%) = (PNL_INR / MARGIN_INR) * 100
         const roePercentage = (pnlInr / MARGIN_INR) * 100;
 
 
-        // --- 4. Format and Update DOM ---
+        // --- Update DOM ---
         
         // PNL Update
         const pnlText = `${pnlInr >= 0 ? '+' : ''}₹${pnlInr.toFixed(2)}`;
@@ -295,4 +301,3 @@
     setInterval(fetchAndUpdateTradeCard, REFRESH_INTERVAL_MS);
 </script>
 </html>
-
