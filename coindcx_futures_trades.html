@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ETH Profit Widget (CoinDCX)</title>
+
+<style>
+    /* Global Styles */
+    html, body {
+        height: 100%;
+        margin: 0;
+        font-family: 'Inter', 'Segoe UI', 'Roboto', 'system-ui', 'Arial', sans-serif;
+        background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
+        color: #e6eef8; 
+        /* Center the content */
+        display: flex; 
+        justify-content: center; /* Center horizontally */
+        align-items: flex-start; /* Center vertically */
+        box-sizing: border-box;
+        padding-top: 20px;
+    }
+
+    /* Widget Container */
+    .trade-card {
+        background-color: #1a1e27; 
+        border-radius: 12px;
+        padding: 20px;
+        width: 350px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        gap: 15px; 
+    }
+
+    /* Header Section */
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .pair-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pair-name {
+        font-size: 1.3em;
+        font-weight: 600;
+        color: #e6eef8;
+    }
+
+    /* Updated Long Tag to include leverage */
+    .long-tag {
+        background-color: #008000; 
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-buttons button {
+        background: none;
+        border: none;
+        color: #a0a0a0;
+        font-size: 1.2em;
+        cursor: pointer;
+    }
+
+    /* PNL and ROE Section */
+    .pnl-roe-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        text-align: left;
+    }
+
+    .pnl-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pnl-label, .roe-label {
+        font-size: 0.85em;
+        color: #a0a0a0;
+        margin-bottom: 5px;
+    }
+
+    .pnl-value, .roe-value {
+        font-size: 1.6em;
+        font-weight: 700;
+    }
+
+    .positive {
+        color: #00a000; /* Bright green for positive values */
+    }
+
+    .negative {
+        color: #d00000; /* Red for negative values */
+    }
+
+    /* Details Grid Section */
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; /* Three columns */
+        gap: 15px 10px; /* Vertical and horizontal gap */
+        margin-top: 15px;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+    }
+
+    .detail-label {
+        font-size: 0.8em;
+        color: #a0a0a0;
+        margin-bottom: 3px;
+    }
+
+    .detail-value {
+        font-size: 1em;
+        font-weight: 500;
+        color: #e6eef8;
+    }
+</style>
+</head>
+
+<body>
+    <div class="trade-card">
+        
+        <div class="card-header">
+            <div class="pair-info">
+                <span class="pair-name">ETH • USDT</span>
+                <span id="leverageTag" class="long-tag">Long 1x</span> 
+            </div>
+            <div class="action-buttons">
+                <button title="Info">ⓘ</button>
+                <button title="Share">↗</button>
+            </div>
+        </div>
+
+        <div class="pnl-roe-section">
+            <div class="pnl-item">
+                <span class="pnl-label">Active PNL</span>
+                <span id="activePnl" class="pnl-value">Loading...</span>
+            </div>
+            <div class="pnl-item">
+                <span class="roe-label">ROE</span>
+                <span id="roe" class="roe-value">...</span>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-item">
+                <span class="detail-label">Qty (ETH)</span>
+                <span id="qtyEth" class="detail-value">0.027</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Size</span>
+                <span id="sizeValue" class="detail-value">₹9,620.94</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Margin</span>
+                <span id="marginValue" class="detail-value">₹9,529.89</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Avg. Entry (USDT)</span>
+                <span id="avgEntry" class="detail-value">3795.53</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">LTP (USDT)</span>
+                <span id="ltpUsdt" class="detail-value">...</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Liq. Price (USDT)</span>
+                <span id="liqPrice" class="detail-value">41.86</span>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const API_URL = "https://api.coindcx.com/exchange/ticker";
+    const PAIR = "ETHUSDT";
+    const REFRESH_INTERVAL_MS = 15000; // 15 seconds
+
+    // --- Hardcoded TRADE DETAILS (Update these with your real trade values) ---
+    const LEVERAGE = 1; // <-- NEW: Set your actual leverage here (e.g., 5x, 10x)
+    const AVG_ENTRY_PRICE_USD = 3795.53; 
+    const QUANTITY_ETH = 0.027; 
+    const MARGIN_INR = 9529.89; // Initial margin used for the trade
+    const USD_INR_RATE = 83.50; // Required for PNL_INR calculation
+
+    // --- Element References ---
+    const activePnlElement = document.getElementById('activePnl');
+    const roeElement = document.getElementById('roe');
+    const ltpUsdtElement = document.getElementById('ltpUsdt');
+    const leverageTagElement = document.getElementById('leverageTag');
+
+    // Update the leverage tag in the header
+    leverageTagElement.innerText = `Long ${LEVERAGE}x`;
+
+
+    /**
+     * Calculates and updates the PNL and ROE based on the Last Traded Price (LTP).
+     * @param {number} ltp The Last Traded Price (LTP) in USDT.
+     */
+    function updateCalculations(ltp) {
+        // --- 1. Calculate PNL (USDT) ---
+        // This is the profit from the change in price multiplied by the quantity. Leverage does NOT affect PNL in base currency.
+        const priceDifference = ltp - AVG_ENTRY_PRICE_USD;
+        const pnlUsdt = priceDifference * QUANTITY_ETH;
+        
+        // --- 2. Calculate PNL (INR) for display ---
+        const pnlInr = pnlUsdt * USD_INR_RATE;
+        
+        // --- 3. Calculate ROE (%) ---
+        // ROE = (PNL_INR / MARGIN_INR) * 100
+        // Leverage is implicitly factored in because MARGIN_INR is the actual equity used.
+        const roePercentage = (pnlInr / MARGIN_INR) * 100;
+
+
+        // --- 4. Format and Update DOM ---
+        
+        // PNL Update
+        const pnlText = `${pnlInr >= 0 ? '+' : ''}₹${pnlInr.toFixed(2)}`;
+        activePnlElement.innerText = pnlText;
+        activePnlElement.classList.remove('positive', 'negative');
+        activePnlElement.classList.add(pnlInr >= 0 ? 'positive' : 'negative');
+
+        // ROE Update
+        const roeText = `${roePercentage >= 0 ? '+' : ''}${roePercentage.toFixed(2)}%`;
+        roeElement.innerText = roeText;
+        roeElement.classList.remove('positive', 'negative');
+        roeElement.classList.add(roePercentage >= 0 ? 'positive' : 'negative');
+        
+        // LTP Update
+        ltpUsdtElement.innerText = ltp.toFixed(2);
+    }
+
+    /**
+     * Fetches the current ticker data and updates the card.
+     */
+    async function fetchAndUpdateTradeCard() {
+        try {
+            const response = await fetch(API_URL);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            const ticker = data.find(t => t.market === PAIR);
+
+            if (ticker) {
+                const lastPrice = parseFloat(ticker.last_price);
+                updateCalculations(lastPrice);
+            } else {
+                ltpUsdtElement.innerText = 'N/A';
+                activePnlElement.innerText = 'Error';
+                roeElement.innerText = 'Error';
+            }
+
+        } catch (error) {
+            console.error("Failed to fetch or process ticker data:", error);
+            ltpUsdtElement.innerText = 'Fetch Error';
+            activePnlElement.innerText = 'Error';
+            roeElement.innerText = 'Error';
+        }
+    }
+
+    // --- Start the refresh process ---
+    fetchAndUpdateTradeCard(); 
+    setInterval(fetchAndUpdateTradeCard, REFRESH_INTERVAL_MS);
+</script>
+</html>
