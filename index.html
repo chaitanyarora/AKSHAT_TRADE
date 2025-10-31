@@ -8,7 +8,6 @@
 <style>
     /* Global Styles */
     html, body {
-        height: 100%;
         margin: 0;
         font-family: 'Inter', 'Segoe UI', 'Roboto', 'system-ui', 'Arial', sans-serif;
         background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
@@ -34,6 +33,18 @@
         flex-direction: column;
         gap: 15px; 
     }
+
+    .wrapper {
+    /* The wrapper should be full width to contain the centered content */
+    width: 100%; 
+    
+    /* Add a clean, small margin to push the content down from the top edge */
+    
+    /* Use flexbox within the wrapper to center the card */
+    display: flex;
+    justify-content: center; /* Centers the .trade-card inside the wrapper */
+    align-items: flex-start;
+}
 
     /* Header Section */
     .card-header {
@@ -139,6 +150,7 @@
 </head>
 
 <body>
+    <div class="wrapper">
     <div class="trade-card">
         
         <div class="card-header">
@@ -190,6 +202,7 @@
             </div>
         </div>
     </div>
+</div>
 
 <script>
     const API_URL = "https://api.coindcx.com/exchange/ticker";
@@ -286,5 +299,4 @@
     setInterval(fetchAndUpdateTradeCard, REFRESH_INTERVAL_MS);
 </script>
 </html>
-
 
