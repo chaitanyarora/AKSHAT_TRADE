@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#071226"/>
 <title>ETH Profit Widget (CoinDCX)</title>
 
 <style>
@@ -12,69 +14,65 @@
         width: 100%;
         margin: 0;
         
-        /* CRITICAL: Apply the gradient here to ensure the browser's root background is dark */
+        /* CRITICAL: Apply gradient to root background */
         background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
-        
         font-family: 'Inter', 'Segoe UI', 'Roboto', 'system-ui', 'Arial', sans-serif;
         color: #e6eef8; 
         box-sizing: border-box;
         
         /* Flexbox for centering */
         display: flex; 
-        justify-content: center; /* Center horizontally */
-        align-items: flex-start; /* Align to the TOP */
+        justify-content: center; 
+        align-items: flex-start;
+
+        /* Ensure background extends under notch / home bar */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        
+        background-attachment: fixed;
     }
 
     /* Wrapper: Handles content width and top padding */
     .wrapper {
-        /* Ensures the wrapper covers the full viewport height */
-        min-height: 100vh;
+        min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         width: 100vw; 
-        
         display: flex;
         justify-content: center; 
         align-items: flex-start;
-        
-        /* Adds the clean separation from the top edge */
         padding-top: 20px; 
-        padding-left: 0;
-        padding-right: 0;
     }
 
     /* Widget Container */
     .trade-card {
         background-color: #1a1e27; 
         border-radius: 12px;
-        
-        /* Internal padding for text */
         padding: 20px; 
-        
-        /* Fluid width for edge-to-edge appearance on mobile */
         width: 90%; 
-        max-width: 400px; /* Prevents card from getting too wide on large screens */
-        
-        /* Small horizontal margin to prevent touching the physical device edge */
+        max-width: 400px;
         margin: 0 10px; 
-        
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         display: flex;
         flex-direction: column;
         gap: 15px; 
     }
 
-    /* --- REST OF THE STYLES (Content Layout) --- */
+    /* --- CONTENT STYLES --- */
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .pair-info { display: flex; align-items: center; gap: 10px; }
     .pair-name { font-size: 1.3em; font-weight: 600; color: #e6eef8; }
     .long-tag { background-color: #008000; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 500; }
     .action-buttons { display: flex; gap: 10px; }
     .action-buttons button { background: none; border: none; color: #a0a0a0; font-size: 1.2em; cursor: pointer; }
+
     .pnl-roe-section { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
     .pnl-item { display: flex; flex-direction: column; }
     .pnl-label, .roe-label { font-size: 0.85em; color: #a0a0a0; margin-bottom: 5px; }
     .pnl-value, .roe-value { font-size: 1.6em; font-weight: 700; }
     .positive { color: #00a000; }
     .negative { color: #d00000; }
+
     .details-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px 10px; margin-top: 15px; }
     .detail-item { display: flex; flex-direction: column; text-align: left; }
     .detail-label { font-size: 0.8em; color: #a0a0a0; margin-bottom: 3px; }
@@ -85,7 +83,6 @@
 <body>
     <div class="wrapper">
         <div class="trade-card">
-            
             <div class="card-header">
                 <div class="pair-info">
                     <span class="pair-name">ETH • USDT</span>
@@ -157,44 +154,31 @@
 
     leverageTagElement.innerText = `Long ${LEVERAGE}x`;
 
-
-    /**
-     * Calculates and updates the PNL and ROE based on the Last Traded Price (LTP).
-     * @param {number} ltp The Last Traded Price (LTP) in USDT.
-     */
+    /** Calculates and updates PNL & ROE */
     function updateCalculations(ltp) {
         const priceDifference = ltp - AVG_ENTRY_PRICE_USD;
         const pnlUsdt = priceDifference * QUANTITY_ETH;
         const pnlInr = pnlUsdt * USD_INR_RATE;
         const roePercentage = (pnlInr / MARGIN_INR) * 100;
 
-        // PNL Update
         const pnlText = `${pnlInr >= 0 ? '+' : ''}₹${pnlInr.toFixed(2)}`;
         activePnlElement.innerText = pnlText;
         activePnlElement.classList.remove('positive', 'negative');
         activePnlElement.classList.add(pnlInr >= 0 ? 'positive' : 'negative');
 
-        // ROE Update
         const roeText = `${roePercentage >= 0 ? '+' : ''}${roePercentage.toFixed(2)}%`;
         roeElement.innerText = roeText;
         roeElement.classList.remove('positive', 'negative');
         roeElement.classList.add(roePercentage >= 0 ? 'positive' : 'negative');
         
-        // LTP Update
         ltpUsdtElement.innerText = ltp.toFixed(2);
     }
 
-    /**
-     * Fetches the current ticker data and updates the card.
-     */
+    /** Fetches ticker data and updates UI */
     async function fetchAndUpdateTradeCard() {
         try {
             const response = await fetch(API_URL);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
+            if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
             const data = await response.json();
             const ticker = data.find(t => t.market === PAIR);
 
@@ -206,16 +190,14 @@
                 activePnlElement.innerText = 'Error';
                 roeElement.innerText = 'Error';
             }
-
         } catch (error) {
-            console.error("Failed to fetch or process ticker data:", error);
+            console.error("Failed to fetch ticker data:", error);
             ltpUsdtElement.innerText = 'Fetch Error';
             activePnlElement.innerText = 'Error';
             roeElement.innerText = 'Error';
         }
     }
 
-    // --- Start the refresh process ---
     fetchAndUpdateTradeCard(); 
     setInterval(fetchAndUpdateTradeCard, REFRESH_INTERVAL_MS);
 </script>
