@@ -114,7 +114,7 @@
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Size</span>
-                    <span id="sizeValue" class="detail-value">₹9,620.94</span>
+                    <span id="sizeValue" class="detail-value">₹42,007.08</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Margin</span>
@@ -146,7 +146,7 @@
     const AVG_ENTRY_PRICE_USD = 3841.72; 
     const QUANTITY_ETH = 0.117; 
     const MARGIN_INR = 41800.48; 
-    const USD_INR_RATE = 83.50; 
+    const USD_INR_RATE = 93; 
 
     // --- Element References ---
     const activePnlElement = document.getElementById('activePnl');
@@ -154,8 +154,14 @@
     const ltpUsdtElement = document.getElementById('ltpUsdt');
     const leverageTagElement = document.getElementById('leverageTag');
 
-    leverageTagElement.innerText = `Long ${LEVERAGE}x`;
+    const qtyEthElement = document.getElementById('qtyEth');
+    qtyEthElement.innerText = QUANTITY_ETH;
 
+    const marginValueElement = document.getElementById('marginValue');
+    marginValueElement.innerText = `₹${MARGIN_INR}`;
+
+
+    leverageTagElement.innerText = `Long ${LEVERAGE}x`;
     /** Calculates and updates PNL & ROE */
     function updateCalculations(ltp) {
         const priceDifference = ltp - AVG_ENTRY_PRICE_USD;
@@ -204,5 +210,4 @@
     setInterval(fetchAndUpdateTradeCard, REFRESH_INTERVAL_MS);
 </script>
 </html>
-
 
