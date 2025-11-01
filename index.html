@@ -274,7 +274,7 @@
 
         // update UI elements
         uiRefs.ltp.innerText = formatNum(lastPrice, 2);
-        uiRefs.pnl.innerText = (pnlInr >= 0 ? '+' : '') + formatINR(Math.abs(pnlInr)).replace('₹','') ;
+        uiRefs.pnl.innerText = (pnlInr >= 0 ? '+' : '-') + formatINR(Math.abs(pnlInr)).replace('₹','') ;
         uiRefs.pnl.classList.remove('positive','negative');
         uiRefs.pnl.classList.add(pnlInr >= 0 ? 'positive' : 'negative');
 
@@ -337,3 +337,4 @@
 </script>
 </body>
 </html>
+
