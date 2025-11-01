@@ -7,60 +7,51 @@
 <meta name="theme-color" content="#071226"/>
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="shortcut icon" href="favicon.ico">
-<title>ETH Profit Widget (CoinDCX)</title>
+<title>ETH & SOL Profit Widget (CoinDCX)</title>
 
 <style>
-    /* Global Styles: Ensure full screen dark background and centering setup */
+    /* keep original styling exactly as you had it */
     html, body {
         height: 100%;
         width: 100%;
         margin: 0;
-        
-        /* CRITICAL: Apply gradient to root background */
         background: linear-gradient(180deg, #071226 0%, #071226 45%, #041022 100%);
         font-family: 'Inter', 'Segoe UI', 'Roboto', 'system-ui', 'Arial', sans-serif;
-        color: #e6eef8; 
+        color: #e6eef8;
         box-sizing: border-box;
-        
-        /* Flexbox for centering */
-        display: flex; 
-        justify-content: center; 
+        display: flex;
+        justify-content: center;
         align-items: flex-start;
-
-        /* Ensure background extends under notch / home bar */
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
         padding-left: env(safe-area-inset-left);
         padding-right: env(safe-area-inset-right);
-        
         background-attachment: fixed;
     }
 
-    /* Wrapper: Handles content width and top padding */
     .wrapper {
         min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-        width: 100vw; 
+        width: 95%;
         display: flex;
-        justify-content: center; 
+        justify-content: center;
         align-items: flex-start;
-        padding-top: 20px; 
+        padding-top: 20px;
     }
 
-    /* Widget Container */
     .trade-card {
-        background-color: #1a1e27; 
+        background-color: #1a1e27;
         border-radius: 12px;
-        padding: 20px; 
-        width: 90%; 
+        padding: 20px;
+        width: 90%;
         max-width: 400px;
-        margin: 0 10px; 
+        margin: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         display: flex;
         flex-direction: column;
-        gap: 15px; 
+        gap: 15px;
     }
 
-    /* --- CONTENT STYLES --- */
+    /* header & pair */
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .pair-info { display: flex; align-items: center; gap: 10px; }
     .pair-name { font-size: 1.3em; font-weight: 600; color: #e6eef8; }
@@ -79,135 +70,270 @@
     .detail-item { display: flex; flex-direction: column; text-align: left; }
     .detail-label { font-size: 0.8em; color: #a0a0a0; margin-bottom: 3px; }
     .detail-value { font-size: 1em; font-weight: 500; color: #e6eef8; }
+
+    /* layout container for stacking two cards vertically but centered */
+    .cards-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 420px; }
+
+    footer { margin-top: 10px; color: #9aa7bf; font-size: 13px; text-align: center; }
 </style>
 </head>
 
 <body>
     <div class="wrapper">
-        <div class="trade-card">
-            <div class="card-header">
-                <div class="pair-info">
-                    <span class="pair-name">ETH • USDT</span>
-                    <span id="leverageTag" class="long-tag">Long 1x</span> 
+        <div class="cards-container">
+            <!-- ETH CARD (original look preserved) -->
+            <div class="trade-card" id="eth-card">
+                <div class="card-header">
+                    <div class="pair-info">
+                        <span class="pair-name">ETH • USDT</span>
+                        <span id="eth-leverage-tag" class="long-tag">Long 1x</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button title="Info">ⓘ</button>
+                        <button title="Share">↗</button>
+                    </div>
                 </div>
-                <div class="action-buttons">
-                    <button title="Info">ⓘ</button>
-                    <button title="Share">↗</button>
+
+                <div class="pnl-roe-section">
+                    <div class="pnl-item">
+                        <span class="pnl-label">Active PNL</span>
+                        <span id="eth-activePnl" class="pnl-value">Loading...</span>
+                    </div>
+                    <div class="pnl-item">
+                        <span class="roe-label">ROE</span>
+                        <span id="eth-roe" class="roe-value">...</span>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Qty (ETH)</span>
+                        <span id="eth-qty" class="detail-value">0.117</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Size</span>
+                        <span id="eth-size" class="detail-value">₹42,213.34</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Margin</span>
+                        <span id="eth-margin" class="detail-value">₹9,529.89</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Avg. Entry (USDT)</span>
+                        <span id="eth-avgEntry" class="detail-value">3841.72</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">LTP (USDT)</span>
+                        <span id="eth-ltp" class="detail-value">...</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Liq. Price (USDT)</span>
+                        <span id="eth-liqPrice" class="detail-value">41.86</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="pnl-roe-section">
-                <div class="pnl-item">
-                    <span class="pnl-label">Active PNL</span>
-                    <span id="activePnl" class="pnl-value">Loading...</span>
+            <!-- SOL CARD (added, follows same design) -->
+            <div class="trade-card" id="sol-card">
+                <div class="card-header">
+                    <div class="pair-info">
+                        <span class="pair-name">SOL • USDT</span>
+                        <span id="sol-leverage-tag" class="long-tag">Long 1x</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button title="Info">ⓘ</button>
+                        <button title="Share">↗</button>
+                    </div>
                 </div>
-                <div class="pnl-item">
-                    <span class="roe-label">ROE</span>
-                    <span id="roe" class="roe-value">...</span>
+
+                <div class="pnl-roe-section">
+                    <div class="pnl-item">
+                        <span class="pnl-label">Active PNL</span>
+                        <span id="sol-activePnl" class="pnl-value">Loading...</span>
+                    </div>
+                    <div class="pnl-item">
+                        <span class="roe-label">ROE</span>
+                        <span id="sol-roe" class="roe-value">...</span>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Qty (SOL)</span>
+                        <span id="sol-qty" class="detail-value">1.84</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Size</span>
+                        <span id="sol-size" class="detail-value">₹32,213.34</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Margin</span>
+                        <span id="sol-margin" class="detail-value">₹32,257.27</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Avg. Entry (USDT)</span>
+                        <span id="sol-avgEntry" class="detail-value">188.44</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">LTP (USDT)</span>
+                        <span id="sol-ltp" class="detail-value">...</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Liq. Price (USDT)</span>
+                        <span id="sol-liqPrice" class="detail-value">0.88</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="details-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Qty (ETH)</span>
-                    <span id="qtyEth" class="detail-value">0.027</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Size</span>
-                    <span id="sizeValue" class="detail-value">₹42,007.08</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Margin</span>
-                    <span id="marginValue" class="detail-value">₹9,529.89</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Avg. Entry (USDT)</span>
-                    <span id="avgEntry" class="detail-value">3795.53</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">LTP (USDT)</span>
-                    <span id="ltpUsdt" class="detail-value">...</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Liq. Price (USDT)</span>
-                    <span id="liqPrice" class="detail-value">41.86</span>
-                </div>
-            </div>
+            <footer>Data via CoinDCX public API • Auto-refresh every 15s • Edit hardcoded trade details in the script.</footer>
         </div>
     </div>
 
 <script>
+    // keep same API and refresh interval as you had
     const API_URL = "https://api.coindcx.com/exchange/ticker";
-    const PAIR = "ETHUSDT";
-    const REFRESH_INTERVAL_MS = 15000; // 15 seconds
+    const REFRESH_INTERVAL_MS = 15000;
+    const USD_INR_RATE = 93; // same fixed conversion as before (change to live FX if needed)
 
-    // --- Hardcoded TRADE DETAILS (UPDATE THESE) ---
-    const LEVERAGE = 1; 
-    const AVG_ENTRY_PRICE_USD = 3841.72; 
-    const QUANTITY_ETH = 0.117; 
-    const MARGIN_INR = 41800.48; 
-    const USD_INR_RATE = 93; 
+    // --- Hardcoded trade details (edit here if you want different defaults) ---
+    const ETH = {
+        pair: "ETHUSDT",
+        qty: 0.117,
+        entry: 3841.72,       // avg entry in USDT
+        margin_inr: 41800.48,
+        leverage: 1
+    };
 
-    // --- Element References ---
-    const activePnlElement = document.getElementById('activePnl');
-    const roeElement = document.getElementById('roe');
-    const ltpUsdtElement = document.getElementById('ltpUsdt');
-    const leverageTagElement = document.getElementById('leverageTag');
+    const SOL = {
+        pair: "SOLUSDT",
+        qty: 1.84,
+        entry: 188.44,       // avg entry in USDT
+        margin_inr: 32257.27,
+        leverage: 1
+    };
 
-    const qtyEthElement = document.getElementById('qtyEth');
-    qtyEthElement.innerText = QUANTITY_ETH;
+    // UI refs ETH
+    const ethActivePnl = document.getElementById('eth-activePnl');
+    const ethRoe = document.getElementById('eth-roe');
+    const ethLtp = document.getElementById('eth-ltp');
+    const ethQty = document.getElementById('eth-qty');
+    const ethSize = document.getElementById('eth-size');
+    const ethMargin = document.getElementById('eth-margin');
+    const ethAvgEntry = document.getElementById('eth-avgEntry');
+    const ethLiq = document.getElementById('eth-liqPrice');
 
-    const marginValueElement = document.getElementById('marginValue');
-    marginValueElement.innerText = `₹${MARGIN_INR}`;
+    // UI refs SOL
+    const solActivePnl = document.getElementById('sol-activePnl');
+    const solRoe = document.getElementById('sol-roe');
+    const solLtp = document.getElementById('sol-ltp');
+    const solQty = document.getElementById('sol-qty');
+    const solSize = document.getElementById('sol-size');
+    const solMargin = document.getElementById('sol-margin');
+    const solAvgEntry = document.getElementById('sol-avgEntry');
+    const solLiq = document.getElementById('sol-liqPrice');
 
+    // initialize static fields from config
+    ethQty.innerText = ETH.qty;
+    ethAvgEntry.innerText = ETH.entry;
+    ethMargin.innerText = `₹${Number(ETH.margin_inr).toLocaleString('en-IN', {maximumFractionDigits:2})}`;
 
-    leverageTagElement.innerText = `Long ${LEVERAGE}x`;
-    /** Calculates and updates PNL & ROE */
-    function updateCalculations(ltp) {
-        const priceDifference = ltp - AVG_ENTRY_PRICE_USD;
-        const pnlUsdt = priceDifference * QUANTITY_ETH;
-        const pnlInr = pnlUsdt * USD_INR_RATE;
-        const roePercentage = (pnlInr / MARGIN_INR) * 100;
+    solQty.innerText = SOL.qty;
+    solAvgEntry.innerText = SOL.entry;
+    solMargin.innerText = `₹${Number(SOL.margin_inr).toLocaleString('en-IN', {maximumFractionDigits:2})}`;
 
-        const pnlText = `${pnlInr >= 0 ? '+' : ''}₹${pnlInr.toFixed(2)}`;
-        activePnlElement.innerText = pnlText;
-        activePnlElement.classList.remove('positive', 'negative');
-        activePnlElement.classList.add(pnlInr >= 0 ? 'positive' : 'negative');
+    function formatINR(n){ return '₹' + Number(n).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+    function formatPct(n){ return (n >= 0 ? '+' : '') + Number(n).toFixed(2) + '%'; }
+    function formatNum(n, dp=2){ return Number(n).toFixed(dp); }
 
-        const roeText = `${roePercentage >= 0 ? '+' : ''}${roePercentage.toFixed(2)}%`;
-        roeElement.innerText = roeText;
-        roeElement.classList.remove('positive', 'negative');
-        roeElement.classList.add(roePercentage >= 0 ? 'positive' : 'negative');
-        
-        ltpUsdtElement.innerText = ltp.toFixed(2);
+    async function fetchTickerJson(){
+        const res = await fetch(API_URL, { cache: "no-store" });
+        if(!res.ok) throw new Error('Ticker fetch failed: ' + res.status);
+        return res.json();
     }
 
-    /** Fetches ticker data and updates UI */
-    async function fetchAndUpdateTradeCard() {
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
-            const data = await response.json();
-            const ticker = data.find(t => t.market === PAIR);
+    function findMarket(data, pair){
+        // normalize and match like previous code: remove slash and uppercase
+        const normalized = pair.toUpperCase().replace('/','');
+        return data.find(t => (t.market || '').toUpperCase().replace('/','') === normalized);
+    }
 
-            if (ticker) {
-                const lastPrice = parseFloat(ticker.last_price);
-                updateCalculations(lastPrice);
-            } else {
-                ltpUsdtElement.innerText = 'N/A';
-                activePnlElement.innerText = 'Error';
-                roeElement.innerText = 'Error';
-            }
-        } catch (error) {
-            console.error("Failed to fetch ticker data:", error);
-            ltpUsdtElement.innerText = 'Fetch Error';
-            activePnlElement.innerText = 'Error';
-            roeElement.innerText = 'Error';
+    function updateUIForSymbol(cfg, marketEntry, uiRefs) {
+        if(!marketEntry){
+            uiRefs.ltp.innerText = 'N/A';
+            uiRefs.pnl.innerText = 'Error';
+            uiRefs.roe.innerText = '—';
+            return;
+        }
+        const lastPrice = Number(marketEntry.last_price || marketEntry.last || marketEntry.lastPrice);
+        // pnl in USD then convert to INR with USD_INR_RATE
+        const pnlUsd = (lastPrice - cfg.entry) * cfg.qty;
+        const pnlInr = pnlUsd * USD_INR_RATE;
+        const roe = cfg.margin_inr ? (pnlInr / cfg.margin_inr) * 100 : 0;
+        const sizeUsd = lastPrice * cfg.qty;
+        const sizeInr = sizeUsd * USD_INR_RATE;
+
+        // update UI elements
+        uiRefs.ltp.innerText = formatNum(lastPrice, 2);
+        uiRefs.pnl.innerText = (pnlInr >= 0 ? '+' : '') + formatINR(Math.abs(pnlInr)).replace('₹','') ;
+        uiRefs.pnl.classList.remove('positive','negative');
+        uiRefs.pnl.classList.add(pnlInr >= 0 ? 'positive' : 'negative');
+
+        uiRefs.roe.innerText = formatPct(roe);
+        uiRefs.roe.classList.remove('positive','negative');
+        uiRefs.roe.classList.add(roe >= 0 ? 'positive' : 'negative');
+
+        if(uiRefs.size) uiRefs.size.innerText = formatINR(sizeInr);
+        if(uiRefs.liq) uiRefs.liq.innerText = uiRefs.liq.innerText; // leave liq as-is unless you compute it
+    }
+
+    async function refreshAll(){
+        try{
+            const data = await fetchTickerJson();
+
+            const ethMarket = findMarket(data, ETH.pair);
+            const solMarket = findMarket(data, SOL.pair);
+
+            updateUIForSymbol(ETH, ethMarket, {
+                ltp: ethLtp,
+                pnl: ethActivePnl,
+                roe: ethRoe,
+                size: ethSize,
+                liq: ethLiq
+            });
+
+            updateUIForSymbol(SOL, solMarket, {
+                ltp: solLtp,
+                pnl: solActivePnl,
+                roe: solRoe,
+                size: solSize,
+                liq: solLiq
+            });
+
+            // update status (small UX)
+            const now = new Date().toLocaleTimeString();
+            const statusEl = document.querySelector('footer') || null;
+            if(statusEl) statusEl.innerText = `Data via CoinDCX public API • Auto-refresh every 15s • Last updated: ${now}`;
+
+        } catch(err){
+            console.error(err);
+            const statusEl = document.querySelector('footer');
+            if(statusEl) statusEl.innerText = `Fetch error • ${err.message}`;
+            // set minimal visible error state
+            ethLtp.innerText = 'Fetch Error';
+            solLtp.innerText = 'Fetch Error';
+            ethActivePnl.innerText = 'Error';
+            solActivePnl.innerText = 'Error';
+            ethRoe.innerText = '—';
+            solRoe.innerText = '—';
         }
     }
 
-    fetchAndUpdateTradeCard(); 
-    setInterval(fetchAndUpdateTradeCard, REFRESH_INTERVAL_MS);
-</script>
-</html>
+    // initial run + interval
+    refreshAll();
+    setInterval(refreshAll, REFRESH_INTERVAL_MS);
 
+    // r to refresh manually
+    window.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='r') refreshAll(); });
+</script>
+</body>
+</html>
